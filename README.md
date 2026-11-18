@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshot.png" alt="The Portside menu listing four URLs grouped by project" width="345">
+  <img src="docs/screenshot.png" alt="The Portside menu listing four URLs grouped by project" width="372">
 </p>
 
 ## What it does
