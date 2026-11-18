@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: Portside
+    steps:
+      - uses: actions/checkout@v7
+      - run: swift --version
+      - run: swift test
+      - name: Build DMG and appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          if [ -z "$SPARKLE_PRIVATE_KEY" ]; then
+            echo "::error::SPARKLE_PRIVATE_KEY is not available. Pull requests from forks cannot sign the appcast."
+            exit 1
+          fi
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            export VERSION="${GITHUB_REF_NAME#v}"
+          else
+            export VERSION=0.0.0
+          fi
+          scripts/release.sh
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Portside
+          path: |
+            Portside/build/Portside.dmg
+            Portside/build/appcast.xml
+          if-no-files-found: error
+
+  release:
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: Portside
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" Portside.dmg appcast.xml --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes
