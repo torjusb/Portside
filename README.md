@@ -32,7 +32,7 @@ scripts/bundle.sh
 
 The script builds a universal release binary for Apple silicon and Intel. It writes `Portside/build/Portside.app` with Sparkle embedded, and signs the app ad hoc. You can run it again at any time. Set `VERSION` to stamp a version, for example `VERSION=1.2.3 scripts/bundle.sh`. The default is `0.0.0`.
 
-The app icon is `Portside/Assets/AppIcon.icns`. To render it again, run `swift scripts/make-icon.swift` from the `Portside` folder.
+The app icon is `Portside/Assets/AppIcon.icns`. It is rendered from `Portside/Assets/AppIcon.svg`. After you edit the SVG, run `swift scripts/make-icon.swift` from the `Portside` folder to render the icon again.
 
 ## Run
 
