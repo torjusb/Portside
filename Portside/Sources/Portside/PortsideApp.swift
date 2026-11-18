@@ -5,10 +5,11 @@ import SwiftUI
 struct PortsideApp: App {
     @State private var store = StateStore()
     @State private var updater = Updater()
+    @State private var loginItem = LoginItem()
 
     var body: some Scene {
         MenuBarExtra {
-            MenuContent(store: store, updater: updater)
+            MenuContent(store: store, updater: updater, loginItem: loginItem)
         } label: {
             if case .proxyDown = store.snapshot {
                 Image(systemName: "network.slash")
@@ -24,6 +25,7 @@ struct PortsideApp: App {
 struct MenuContent: View {
     let store: StateStore
     let updater: Updater
+    let loginItem: LoginItem
 
     var body: some View {
         switch store.snapshot {
@@ -51,6 +53,7 @@ struct MenuContent: View {
             Button("Check for Updates…") { updater.checkForUpdates() }
                 .disabled(!updater.canCheckForUpdates)
         }
+        Toggle("Launch at Login", isOn: Binding(get: { loginItem.isEnabled }, set: { loginItem.setEnabled($0) }))
         Divider()
         Button("Refresh") { store.refresh() }
             .keyboardShortcut("r")
