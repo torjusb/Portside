@@ -4,10 +4,11 @@ import SwiftUI
 
 struct PortsideApp: App {
     @State private var store = StateStore()
+    @State private var updater = Updater()
 
     var body: some Scene {
         MenuBarExtra {
-            MenuContent(store: store)
+            MenuContent(store: store, updater: updater)
         } label: {
             if case .proxyDown = store.snapshot {
                 Image(systemName: "network.slash")
@@ -22,6 +23,7 @@ struct PortsideApp: App {
 
 struct MenuContent: View {
     let store: StateStore
+    let updater: Updater
 
     var body: some View {
         switch store.snapshot {
@@ -44,10 +46,20 @@ struct MenuContent: View {
             Text("Hold Option to copy a URL")
         }
         Divider()
+        Text("Portside \(version)")
+        if updater.isAvailable {
+            Button("Check for Updates…") { updater.checkForUpdates() }
+                .disabled(!updater.canCheckForUpdates)
+        }
+        Divider()
         Button("Refresh") { store.refresh() }
             .keyboardShortcut("r")
         Button("Quit Portside") { NSApplication.shared.terminate(nil) }
             .keyboardShortcut("q")
+    }
+
+    private var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
     }
 
     private func statusLine(_ proxy: ProxyState) -> String {
